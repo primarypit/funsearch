@@ -99,6 +99,6 @@ def main(
     # This loop can be executed in parallel on remote sampler machines. As each
     # sampler enters an infinite loop, without parallelization only the first
     # sampler will do any work.
-    notebook.start("--logdir " + log_dir)
+    # notebook.start("--logdir " + log_dir)
     for s in samplers:
         s.sample(profiler=profiler)
