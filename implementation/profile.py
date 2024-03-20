@@ -106,15 +106,17 @@ class Profiler:
         sample_time = function.sample_time
         evaluate_time = function.evaluate_time
         score = function.score
+        textinfo = "================= Evaluated Function =================\n" + f"{function_str}\n" + f'Score        : {str(score)}\n' + f'Sample time  : {str(sample_time)}\n' + f'Evaluate time: {str(evaluate_time)}\n' + f'Sample orders: {str(sample_orders)}\n' + f'======================================================\n\n'
+        self._writer.add_text("Attributes of the function", textinfo, sample_orders)
         # log attributes of the function
-        print(f'================= Evaluated Function =================')
+        '''print(f'================= Evaluated Function =================')
         print(f'{function_str}')
         print(f'------------------------------------------------------')
         print(f'Score        : {str(score)}')
         print(f'Sample time  : {str(sample_time)}')
         print(f'Evaluate time: {str(evaluate_time)}')
         print(f'Sample orders: {str(sample_orders)}')
-        print(f'======================================================\n\n')
+        print(f'======================================================\n\n')'''
 
         # update best function
         if function.score is not None and score > self._cur_best_program_score:
