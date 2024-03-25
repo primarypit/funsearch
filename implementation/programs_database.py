@@ -209,7 +209,8 @@ class ProgramsDatabase:
             clusters = island.get_cludsters()
             res[i] = {}
             for sig in clusters.keys():
-                res[i][sig] = {}
+                sig_str = "_".join([str(s) for s in sig])
+                res[i][sig_str] = {}
                 cur_cluster = clusters[sig]
                 score, programs = cur_cluster.get_socre_programs()
                 programs = [str(program) for program in programs]
@@ -223,8 +224,8 @@ class ProgramsDatabase:
                     for p in programs:
                         if p not in best_programs:
                             best_programs.append(p)
-                res[i][sig]["score"] = score
-                res[i][sig]["programs"] = programs
+                res[i][sig_str]["score"] = score
+                res[i][sig_str]["programs"] = programs
         
         with open("best_programs.json", "w") as file:
             json.dump(best_programs, file)
