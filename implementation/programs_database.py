@@ -147,8 +147,10 @@ class ProgramsDatabase:
             program.sample_time = sample_time
             program.evaluate_time = evaluate_time
             profiler.register_function(program)
+    
     def update(self) -> None:
         self._register_nums += 1
+    
     def register_program(
             self,
             program: code_manipulation.Function,
@@ -165,6 +167,7 @@ class ProgramsDatabase:
             for island_id in range(len(self._islands)):
                 self._register_program_in_island(program, island_id, scores_per_test, **kwargs)
         else:
+            print("Cur:{}".format(self._register_nums))
             self._register_program_in_island(program, island_id, scores_per_test, **kwargs)
 
         if self._register_nums % self._config.reset_num == 0:

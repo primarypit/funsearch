@@ -205,7 +205,8 @@ class Evaluator:
         # This is because the register_program will do reduction for a given Function score.
         # If 'score_per_test' is empty, we record it to the profiler at once.
         if scores_per_test:
-            self._database.update()
+            if island_id is not None:
+                self._database.update()
             self._database.register_program(
                 new_function,
                 island_id,
