@@ -167,6 +167,7 @@ class ProgramsDatabase:
             for island_id in range(len(self._islands)):
                 self._register_program_in_island(program, island_id, scores_per_test, **kwargs)
         else:
+            logging.info("Cur num :%d", self._register_nums)
             print("Cur:{}".format(self._register_nums))
             self._register_program_in_island(program, island_id, scores_per_test, **kwargs)
 
