@@ -167,12 +167,10 @@ class ProgramsDatabase:
             for island_id in range(len(self._islands)):
                 self._register_program_in_island(program, island_id, scores_per_test, **kwargs)
         else:
-            logging.info("Cur num :%d", self._register_nums)
-            print("Cur:{}".format(self._register_nums))
             self._register_program_in_island(program, island_id, scores_per_test, **kwargs)
 
-        if self._register_nums % self._config.reset_num == 0:
-            print("Reset, current total register nums:{}".format(self._register_nums))
+        if self._register_nums % self._config.reset_num == 0 and self._register_nums != 0:
+            logging.info("Reset, current total register nums: %d", self._register_nums)
             self.reset_islands()
         
         '''# Check whether it is time to reset an island.
