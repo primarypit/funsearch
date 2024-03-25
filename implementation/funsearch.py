@@ -29,6 +29,7 @@ from implementation import evaluator
 from implementation import programs_database
 from implementation import sampler
 from implementation import profile
+import json
 
 
 def _extract_function_names(specification: str) -> Tuple[str, str]:
@@ -102,3 +103,5 @@ def main(
     # notebook.start("--logdir " + log_dir)
     for s in samplers:
         s.sample(profiler=profiler)
+    
+    database.save_programs()

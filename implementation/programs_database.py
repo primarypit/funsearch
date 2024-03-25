@@ -29,6 +29,7 @@ import scipy
 
 from implementation import code_manipulation
 from implementation import config as config_lib
+import json
 
 # RZ: I change the original code "tuple[float, ...]" to "Tuple[float, ...]"
 Signature = Tuple[float, ...]
@@ -111,6 +112,7 @@ class ProgramsDatabase:
                 [None] * config.num_islands)
 
         self._last_reset_time: float = time.time()
+        self._register_nums = 0
 
     def get_prompt(self) -> Prompt:
         """Returns a prompt containing implementations from one chosen island."""
@@ -164,10 +166,16 @@ class ProgramsDatabase:
         else:
             self._register_program_in_island(program, island_id, scores_per_test, **kwargs)
 
-        # Check whether it is time to reset an island.
+        self._register_nums += 1
+
+        if self._register_nums % self._config.reset_num == 0:
+            print("Reset, current total register nums:{}".format(self._register_nums))
+            self.reset_islands()
+        
+        '''# Check whether it is time to reset an island.
         if time.time() - self._last_reset_time > self._config.reset_period:
             self._last_reset_time = time.time()
-            self.reset_islands()
+            self.reset_islands()'''
 
     def reset_islands(self) -> None:
         """Resets the weaker half of islands."""
@@ -190,6 +198,40 @@ class ProgramsDatabase:
             founder = self._best_program_per_island[founder_island_id]
             founder_scores = self._best_scores_per_test_per_island[founder_island_id]
             self._register_program_in_island(founder, island_id, founder_scores)
+    
+    def save_programs(self) -> dict:
+        res = {}
+
+        # res: island_id->cluster_sig->[func,...]
+        best_socre = None
+        best_programs = None
+
+        for i,island in enumerate(self._islands):
+            clusters = island.get_cludsters()
+            res[i] = {}
+            for sig in clusters.keys():
+                res[i][sig] = {}
+                cur_cluster = clusters[sig]
+                score, programs = cur_cluster.get_socre_programs()
+                programs = [str(program) for program in programs]
+                if best_socre is None:
+                    best_socre = score
+                    best_programs = programs
+                elif score > best_socre:
+                    best_socre = score
+                    best_programs = programs
+                elif score == best_socre:
+                    for p in programs:
+                        if p not in best_programs:
+                            best_programs.append(p)
+                res[i][sig]["score"] = score
+                res[i][sig]["programs"] = programs
+        
+        with open("best_programs.json", "w") as file:
+            json.dump(best_programs, file)
+
+        with open("all_programs.json", "w") as file:
+            json.dump(res, file)
 
 
 class Island:
@@ -212,6 +254,9 @@ class Island:
 
         self._clusters: dict[Signature, Cluster] = {}
         self._num_programs: int = 0
+    
+    def get_cludsters(self) -> dict:
+        return self._clusters
 
     def register_program(
             self,
@@ -320,3 +365,6 @@ class Cluster:
                 max(self._lengths) + 1e-6)
         probabilities = _softmax(-normalized_lengths, temperature=1.0)
         return np.random.choice(self._programs, p=probabilities)
+    
+    def get_socre_programs(self):
+        return self._score, self._programs
