@@ -167,6 +167,7 @@ class ProgramsDatabase:
             self._register_program_in_island(program, island_id, scores_per_test, **kwargs)
 
         self._register_nums += 1
+        print(self._register_nums,self._register_nums % self._config.reset_num)
 
         if self._register_nums % self._config.reset_num == 0:
             print("Reset, current total register nums:{}".format(self._register_nums))
