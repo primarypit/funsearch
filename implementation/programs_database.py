@@ -169,9 +169,9 @@ class ProgramsDatabase:
         else:
             self._register_program_in_island(program, island_id, scores_per_test, **kwargs)
 
-        if self._register_nums % self._config.reset_num == 0 and self._register_nums != 0:
+        '''if self._register_nums % self._config.reset_num == 0 and self._register_nums != 0:
             logging.info("Reset, current total register nums: %d", self._register_nums)
-            self.reset_islands()
+            self.reset_islands()'''
         
         '''# Check whether it is time to reset an island.
         if time.time() - self._last_reset_time > self._config.reset_period:

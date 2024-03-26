@@ -20,6 +20,7 @@ from abc import ABC, abstractmethod
 from typing import Collection, Sequence, Type
 import numpy as np
 import time
+from absl import logging
 
 from implementation import evaluator
 from implementation import programs_database
@@ -77,6 +78,7 @@ class Sampler:
             database: programs_database.ProgramsDatabase,
             evaluators: Sequence[evaluator.Evaluator],
             samples_per_prompt: int,
+            reset_num: int,
             max_sample_nums: int | None = None,
             llm_class: Type[LLM] = LLM
     ):
@@ -85,6 +87,7 @@ class Sampler:
         self._evaluators = evaluators
         self._llm = llm_class(samples_per_prompt)
         self._max_sample_nums = max_sample_nums
+        self.reset_num = reset_num
 
     def sample(self, **kwargs):
         """Continuously gets prompts, samples programs, sends them for analysis.
@@ -111,6 +114,9 @@ class Sampler:
                     global_sample_nums=cur_global_sample_nums,
                     sample_time=sample_time
                 )
+                if cur_global_sample_nums % self.reset_num == 0 and cur_global_sample_nums != 0:
+                    logging.info("Reset, current total register nums: %d", self._register_nums)
+                    self._database.reset_islands()
 
     def _get_global_sample_nums(self) -> int:
         return self.__class__._global_samples_nums
