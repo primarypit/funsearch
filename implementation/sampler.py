@@ -115,7 +115,7 @@ class Sampler:
                     sample_time=sample_time
                 )
                 if cur_global_sample_nums % self.reset_num == 0 and cur_global_sample_nums != 0:
-                    logging.info("Reset, current total register nums: %d", self._register_nums)
+                    logging.info("Reset, current total register nums: %d", cur_global_sample_nums)
                     self._database.reset_islands()
 
     def _get_global_sample_nums(self) -> int:
