@@ -114,6 +114,9 @@ class ProgramsDatabase:
         self._last_reset_time: float = time.time()
         self._register_nums = 0
 
+    def get_island_num(self) -> int:
+        return len(self._islands)
+
     def get_prompt(self) -> Prompt:
         """Returns a prompt containing implementations from one chosen island."""
         island_id = np.random.randint(len(self._islands))
