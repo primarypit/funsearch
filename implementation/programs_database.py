@@ -146,7 +146,7 @@ class ProgramsDatabase:
             program.global_sample_nums = global_sample_nums
             program.sample_time = sample_time
             program.evaluate_time = evaluate_time
-            profiler.register_function(program)
+            profiler.register_function(program, island_id)
     
     def update(self) -> None:
         self._register_nums += 1

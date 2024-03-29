@@ -18,6 +18,7 @@ class Profiler:
             log_dir: str | None = None,
             pkl_dir: str | None = None,
             max_log_nums: int | None = None,
+            island_num:  int | None = None,
     ):
         """
         Args:
@@ -33,6 +34,7 @@ class Profiler:
         self._max_log_nums = max_log_nums
         self._num_samples = 0
         self._cur_best_program_sample_order = None
+        self.cur_best_socre_list = [0] * island_num
         self._cur_best_program_score = -99999999
         self._evaluate_success_program_num = 0
         self._evaluate_failed_program_num = 0
@@ -58,6 +60,17 @@ class Profiler:
             self._cur_best_program_score,
             global_step=self._num_samples
         )
+
+        island_scores = {}
+        for i in range(len(self.cur_best_socre_list)):
+            island_scores["island " + str(i)] = self.cur_best_socre_list[i]
+
+        self._writer.add_scalar(
+            'Best Score of each island',
+            island_scores,
+            global_step=self._num_samples
+        )
+
         self._writer.add_scalars(
             'Legal/Illegal Function',
             {
@@ -86,7 +99,7 @@ class Profiler:
         with open(path, 'w') as json_file:
             json.dump(content, json_file)
 
-    def register_function(self, programs: code_manipulation.Function):
+    def register_function(self, programs: code_manipulation.Function, island_id):
         if self._max_log_nums is not None and self._num_samples >= self._max_log_nums:
             return
 
@@ -94,11 +107,11 @@ class Profiler:
         if sample_orders not in self._all_sampled_functions:
             self._num_samples += 1
             self._all_sampled_functions[sample_orders] = programs
-            self._record_and_verbose(sample_orders)
+            self._record_and_verbose(sample_orders, island_id)
             self._write_tensorboard()
             self._write_json(programs)
 
-    def _record_and_verbose(self, sample_orders: int):
+    def _record_and_verbose(self, sample_orders: int, island_id: int):
         function = self._all_sampled_functions[sample_orders]
         # function_name = function.name
         # function_body = function.body.strip('\n')
@@ -123,6 +136,9 @@ class Profiler:
         if function.score is not None and score > self._cur_best_program_score:
             self._cur_best_program_score = score
             self._cur_best_program_sample_order = sample_orders
+        
+        if function.score is not None and score > self.cur_best_socre_list[island_id]:
+            self.cur_best_socre_list[island_id] = score
 
         # update statistics about function
         if score:

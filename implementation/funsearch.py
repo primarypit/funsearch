@@ -75,7 +75,7 @@ def main(
     if log_dir is None:
         profiler = None
     else:
-        profiler = profile.Profiler(log_dir)
+        profiler = profile.Profiler(log_dir, config.programs_database.num_islands)
 
     evaluators = []
     for _ in range(config.num_evaluators):

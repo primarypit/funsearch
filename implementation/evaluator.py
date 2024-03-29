@@ -224,4 +224,4 @@ class Evaluator:
                 new_function.score = None
                 new_function.sample_time = sample_time
                 new_function.evaluate_time = evaluate_time
-                profiler.register_function(new_function)
+                profiler.register_function(new_function, island_id)
