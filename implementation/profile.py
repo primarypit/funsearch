@@ -65,7 +65,7 @@ class Profiler:
         for i in range(len(self.cur_best_socre_list)):
             island_scores["island " + str(i)] = self.cur_best_socre_list[i]
 
-        self._writer.add_scalar(
+        self._writer.add_scalars(
             'Best Score of each island',
             island_scores,
             global_step=self._num_samples
