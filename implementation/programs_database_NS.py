@@ -180,7 +180,7 @@ class ProgramsDatabase_NS():
                     sims.append(self.calc_sim(routes, target_routes))
             rous.append(sum(sorted(sims)[:self.k]) / self.k)
         
-        keep_ids = np.argsort(-rous)[:self.volume - 1]
+        keep_ids = np.argsort(-rous)[:(self.volume - 1)]
 
         old_pop = self.pop
         self.pop = []
