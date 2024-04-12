@@ -246,6 +246,8 @@ class Evaluator:
         scores_per_test = {}
         routes_per_test = []
 
+        sflag = True
+
         time_reset = time.time()
         for current_input in self._inputs:
             # RZ: IMPORTANT !!! if self._inputs is a dict,
@@ -258,6 +260,8 @@ class Evaluator:
             )
             if runs_ok:
                 test_score, route = results[0], results[1]
+            else:
+                sflag = False
             if runs_ok and not _calls_ancestor(program, self._function_to_evolve) and test_score is not None:
                 if not isinstance(test_score, (int, float)):
                     print(f'RZ=> Error: test_output is {test_score}')
@@ -270,7 +274,7 @@ class Evaluator:
         # RZ: If 'score_per_test' is not empty, the score of the program will be recorded to the profiler by the 'register_program'.
         # This is because the register_program will do reduction for a given Function score.
         # If 'score_per_test' is empty, we record it to the profiler at once.
-        if scores_per_test:
+        if sflag:
             self._database.register_program(
                 new_function,
                 scores_per_test,
