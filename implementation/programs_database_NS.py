@@ -140,17 +140,18 @@ class ProgramsDatabase_NS():
             cur_program.evaluate_time = evaluate_time
             profiler.register_function_NS(cur_program, check_flag)
 
-        if len(self.pop) == self.volume:
+        if len(self.pop) > self.volume:
             logging.info("Reset...")
-            self.reset()
+            self.pop_pop()
+
+        if self.register_num % self.save_period == 0:
             self.threshold *= self.gamma
             if self.threshold > 1:
                 self.threshold = 1 / self.threshold
-            logging.info("New threshold %s", self.threshold)
-        if self.register_num % self.save_period == 0:
             self.save_programs_after_reset()
+            logging.info("New threshold %s", self.threshold)
 
-    def reset(self):
+    def pop_pop(self):
 
         rous = []
 
