@@ -117,7 +117,7 @@ class ProgramsDatabase_NS():
                 target_routes = P.get_rotues()
                 sims.append(self.calc_sim(routes, target_routes))
             novelty_v = sum(sorted(sims)[:self.k]) / self.k
-            logging.info("Current novelty %s", novelty_v)
+            logging.info("Current novelty %s, Current score %s", novelty_v, score)
             if novelty_v > self.threshold:
                 Cur_P = Program_NS(score, routes, cur_program)
                 self.pop.append(Cur_P)
