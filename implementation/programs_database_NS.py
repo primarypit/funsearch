@@ -9,6 +9,7 @@ from queue import PriorityQueue
 from absl import logging
 import numpy as np
 import scipy
+from tqdm import tqdm
 from implementation import code_manipulation
 from implementation import config as config_lib
 from nltk.metrics import edit_distance
@@ -72,7 +73,9 @@ class ProgramsDatabase_NS():
         self.bestscore = 0
         self.bestprogram: Program_NS = None
         self.reset_num = 0
-        self.gamma = 1.2
+        self.register_num = 0
+        self.save_period = 10
+        self.gamma = 1.5
     
     def calc_sim(self, routes1, routes2):
         # 0 <= sum / l < 1, smaller value -> more similar
@@ -103,12 +106,14 @@ class ProgramsDatabase_NS():
             self.bestscore = score
             self.bestprogram = Cur_P
             self.pop.append(Cur_P)
+            self.register_num += 1
             check_flag = True
         elif score > self.bestscore: # new best program
             Cur_P = Program_NS(score, routes, cur_program)
             self.bestscore = score
             self.bestprogram = Cur_P
             self.pop.append(Cur_P)
+            self.register_num += 1
             check_flag = True
         else:
             sims = [] # all sim belong to (0, 1)
@@ -121,6 +126,7 @@ class ProgramsDatabase_NS():
             if novelty_v > self.threshold:
                 Cur_P = Program_NS(score, routes, cur_program)
                 self.pop.append(Cur_P)
+                self.register_num += 1
                 check_flag = True
         
         profiler: profile.Profiler = kwargs.get('profiler', None)
@@ -137,16 +143,31 @@ class ProgramsDatabase_NS():
         if len(self.pop) == self.volume:
             logging.info("Reset...")
             self.reset()
+            self.threshold *= self.gamma
+            if self.threshold > 1:
+                self.threshold = 1 / self.threshold
+            logging.info("New threshold %s", self.threshold)
+        if self.register_num % self.save_period == 0:
             self.save_programs_after_reset()
-            self.reset_num += 1
-            logging.info("New threshold %s", self.threshold * np.power(self.gamma, self.reset_num))
-    
+
     def reset(self):
 
-        keep_num = 5
-
         rous = []
+
+        tmp_best_P = None
+        best_id = None
+        tmp_best_score = 0
         for i in range(len(self.pop)):
+            cur_score = self.pop[i].get_score()
+            if cur_score > tmp_best_score:
+                tmp_best_score = cur_score
+                best_id = i
+        
+        tmp_best_P = self.pop.pop(best_id)
+
+        pbar = tqdm(len(self.pop))
+        for i in pbar:
+            pbar.set_description("Processing pop " + i)
             routes = self.pop[i].get_rotues()
             sims = []
             for j in range(len(self.pop)):
@@ -155,10 +176,11 @@ class ProgramsDatabase_NS():
                     sims.append(self.calc_sim(routes, target_routes))
             rous.append(sum(sorted(sims)[:self.k]) / self.k)
         
-        keep_ids = np.argsort(-rous)[:keep_num]
+        keep_ids = np.argsort(-rous)[:self.volume - 1]
 
         old_pop = self.pop
         self.pop = []
+        self.pop.append(tmp_best_P)
 
         for id in keep_ids:
             self.pop.append(old_pop[id])
@@ -222,7 +244,7 @@ class ProgramsDatabase_NS():
     
     def save_programs_after_reset(self):
         curprograms = [str(P.get_imp()) for P in self.pop]
-        with open("programs_round_{}.json".format(self.reset_num), "w") as file:
+        with open("programs_round_{}.json".format(self.register_num), "w") as file:
             json.dump(curprograms, file)
 
     def save_allprograms(self):
