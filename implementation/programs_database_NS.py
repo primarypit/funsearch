@@ -118,6 +118,7 @@ class ProgramsDatabase_NS():
             novelty_v = sum(sorted(sims)[:self.k]) / self.k
             logging.info("Current novelty %s", novelty_v)
             if novelty_v > self.threshold:
+                Cur_P = Program_NS(score, routes, cur_program)
                 self.pop.append(Cur_P)
                 check_flag = True
         
