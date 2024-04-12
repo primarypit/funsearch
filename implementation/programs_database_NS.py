@@ -147,11 +147,11 @@ class ProgramsDatabase_NS():
 
         rous = []
         for i in range(len(self.pop)):
-            routes = self.pop[i].getroutes()
+            routes = self.pop[i].get_rotues()
             sims = []
             for j in range(len(self.pop)):
                 if j != i:
-                    target_routes = self.pop[j].getroutes()
+                    target_routes = self.pop[j].get_rotues()
                     sims.append(self.calc_sim(routes, target_routes))
             rous.append(sum(sorted(sims)[:self.k]) / self.k)
         
