@@ -115,7 +115,9 @@ class ProgramsDatabase_NS():
             for P in self.pop:
                 target_routes = P.get_rotues()
                 sims.append(self.calc_sim(routes, target_routes))
-            if sum(sorted(sims)[:self.k]) / self.k > self.threshold:
+            novelty_v = sum(sorted(sims)[:self.k]) / self.k
+            logging.info("Current novelty %s", novelty_v)
+            if novelty_v > self.threshold:
                 self.pop.append(Cur_P)
                 check_flag = True
         

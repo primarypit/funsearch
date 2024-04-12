@@ -165,6 +165,7 @@ class Profiler:
                 self._evaluate_success_program_num += 1
                 if check_falg:
                     self._check_success_program_num += 1
+                else:
                     self._check_fail_program_num += 1
             else:
                 self._evaluate_failed_program_num += 1
