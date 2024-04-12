@@ -57,7 +57,7 @@ class ProgramsDatabase_NS_Config:
           sampling temperature.
     """
     functions_per_prompt: int = 2
-    volume: int = 30
+    volume: int = 15
     k: int = 5
     threshold: float = 0.1
     reset_period: int = 4 * 60 * 60

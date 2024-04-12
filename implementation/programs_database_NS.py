@@ -72,6 +72,7 @@ class ProgramsDatabase_NS():
         self.bestscore = 0
         self.bestprogram: Program_NS = None
         self.reset_num = 0
+        self.gamma = 1.2
     
     def calc_sim(self, routes1, routes2):
         # 0 <= sum / l < 1, smaller value -> more similar
@@ -134,9 +135,11 @@ class ProgramsDatabase_NS():
             profiler.register_function_NS(cur_program, check_flag)
 
         if len(self.pop) == self.volume:
+            logging.info("Reset...")
             self.reset()
             self.save_programs_after_reset()
             self.reset_num += 1
+            logging.info("New threshold %s", self.threshold * np.power(self.gamma, self.reset_num))
     
     def reset(self):
 
