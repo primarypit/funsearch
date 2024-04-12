@@ -171,7 +171,7 @@ class ProgramsDatabase_NS():
 
         pbar = tqdm(list(range(len(self.pop))))
         for i in pbar:
-            pbar.set_description("Processing pop " + i)
+            pbar.set_description("Processing pop " + str(i))
             routes = self.pop[i].get_rotues()
             sims = []
             for j in range(len(self.pop)):
