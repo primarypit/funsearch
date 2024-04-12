@@ -103,5 +103,4 @@ def main(
     # notebook.start("--logdir " + log_dir)
     for s in samplers:
         s.sample_NS(profiler=profiler)
-    
-    #database.save_programs()
+    database.save_allprograms()

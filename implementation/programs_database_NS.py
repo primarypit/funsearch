@@ -70,7 +70,7 @@ class ProgramsDatabase_NS():
         self._functions_per_prompt = self._config.functions_per_prompt
         self.pop: list[Program_NS] = []
         self.bestscore = 0
-        self.bestprogram = None
+        self.bestprogram: Program_NS = None
         self.reset_num = 0
     
     def calc_sim(self, routes1, routes2):
@@ -223,3 +223,5 @@ class ProgramsDatabase_NS():
         allprograms = [str(P.get_imp()) for P in self.pop]
         with open("allprograms.json", "w") as file:
             json.dump(allprograms, file)
+        with open("bestprograms.json", "w") as file:
+            json.dump(str(self.bestprogram.get_imp()))
