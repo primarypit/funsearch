@@ -244,7 +244,7 @@ class Evaluator:
         new_function, program = _sample_to_program(
             sample, version_generated, self._template, self._function_to_evolve)
         scores_per_test = {}
-        routes_per_test = {}
+        routes_per_test = []
 
         time_reset = time.time()
         for current_input in self._inputs:
@@ -263,7 +263,7 @@ class Evaluator:
                     print(f'RZ=> Error: test_output is {test_score}')
                     raise ValueError('@function.run did not return an int/float score.')
                 scores_per_test[current_input] = test_score
-                routes_per_test[current_input] = route
+                routes_per_test.append(route)
 
         evaluate_time = time.time() - time_reset
 

@@ -75,9 +75,6 @@ class ProgramsDatabase_NS():
     
     def calc_sim(self, routes1, routes2):
         # 0 <= sum / l < 1, smaller value -> more similar
-        print("Check routes")
-        print(len(routes1))
-        print(len(routes2))
         l = len(routes1)
         sum = 0
         for i in range(l):
@@ -96,7 +93,6 @@ class ProgramsDatabase_NS():
         check_flag = False
         score = _reduce_score(scores_per_test)
         cur_program = program
-        print("Cur Score:", score)
         if score > self.bestscore:
             logging.info('Best score increased to %s', score)
         
