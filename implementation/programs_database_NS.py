@@ -75,6 +75,7 @@ class ProgramsDatabase_NS():
         self.reset_num = 0
         self.register_num = 0
         self.save_period = 10
+        self.score_threshold = 0.9
         self.gamma = 1.5
     
     def calc_sim(self, routes1, routes2):
@@ -122,12 +123,14 @@ class ProgramsDatabase_NS():
                 target_routes = P.get_rotues()
                 sims.append(self.calc_sim(routes, target_routes))
             novelty_v = sum(sorted(sims)[:self.k]) / self.k
-            logging.info("Current novelty %s, Current score %s", novelty_v, score)
-            if novelty_v > self.threshold:
+            if novelty_v  > self.threshold and score > self.score_threshold:
+                logging.info("Current novelty %s, Current score %s, Accept.", novelty_v, score)
                 Cur_P = Program_NS(score, routes, cur_program)
                 self.pop.append(Cur_P)
                 self.register_num += 1
                 check_flag = True
+            else:
+                logging.info("Current novelty %s, Current score %s, Reject", novelty_v, score)
         
         profiler: profile.Profiler = kwargs.get('profiler', None)
         if profiler:
@@ -166,7 +169,7 @@ class ProgramsDatabase_NS():
         
         tmp_best_P = self.pop.pop(best_id)
 
-        pbar = tqdm(len(self.pop))
+        pbar = tqdm(list(range(len(self.pop))))
         for i in pbar:
             pbar.set_description("Processing pop " + i)
             routes = self.pop[i].get_rotues()
