@@ -118,6 +118,31 @@ class Sampler:
                     logging.info("Reset, current total register nums: %d", cur_global_sample_nums)
                     self._database.reset_islands()
 
+    def sample_NS(self, **kwargs):
+        """Continuously gets prompts, samples programs, sends them for analysis.
+        """
+        while True:
+            # stop the search process if hit global max sample nums
+            if self._max_sample_nums and self.__class__._global_samples_nums >= self._max_sample_nums:
+                break
+
+            prompt = self._database.get_prompt()
+            reset_time = time.time()
+            samples = self._llm.draw_samples(prompt.code)
+            sample_time = (time.time() - reset_time) / self._samples_per_prompt
+            # This loop can be executed in parallel on remote evaluator machines.
+            for sample in samples:
+                self._global_sample_nums_plus_one()  # RZ: add _global_sample_nums
+                cur_global_sample_nums = self._get_global_sample_nums()
+                chosen_evaluator: evaluator.Evaluator = np.random.choice(self._evaluators)
+                chosen_evaluator.analyse_NS(
+                    sample,
+                    prompt.version_generated,
+                    **kwargs,
+                    global_sample_nums=cur_global_sample_nums,
+                    sample_time=sample_time
+                )
+
     def _get_global_sample_nums(self) -> int:
         return self.__class__._global_samples_nums
 

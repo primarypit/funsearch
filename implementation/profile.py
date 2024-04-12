@@ -38,6 +38,8 @@ class Profiler:
         self._cur_best_program_score = -99999999
         self._evaluate_success_program_num = 0
         self._evaluate_failed_program_num = 0
+        self._check_success_program_num = 0
+        self._check_fail_program_num = 0
         self._tot_sample_time = 0
         self._tot_evaluate_time = 0
         self._all_sampled_functions: Dict[int, code_manipulation.Function] = {}
@@ -50,7 +52,39 @@ class Profiler:
         self._each_sample_evaluate_failed_program_num = []
         self._each_sample_tot_sample_time = []
         self._each_sample_tot_evaluate_time = []
+    def _write_tensorboard_NS(self):
+        if not self._log_dir:
+            return
+        
+        self._writer.add_scalar(
+            'Best Score of Function',
+            self._cur_best_program_score,
+            global_step=self._num_samples
+        )
 
+        self._writer.add_scalars(
+            'Legal/Illegal Function',
+            {
+                'legal function num': self._evaluate_success_program_num,
+                'illegal function num': self._evaluate_failed_program_num
+            },
+            global_step=self._num_samples
+        )
+
+        self._writer.add_scalars(
+            'Novel/non-Novel Function',
+            {
+                'Novel function num': self._check_success_program_num,
+                'non-Novel function num': self._check_fail_program_num
+            },
+            global_step=self._num_samples
+        )
+
+        self._writer.add_scalars(
+            'Total Sample/Evaluate Time',
+            {'sample time': self._tot_sample_time, 'evaluate time': self._tot_evaluate_time},
+            global_step=self._num_samples
+        )
     def _write_tensorboard(self):
         if not self._log_dir:
             return
@@ -110,6 +144,36 @@ class Profiler:
             self._record_and_verbose(sample_orders, island_id)
             self._write_tensorboard()
             self._write_json(programs)
+
+    def register_function_NS(self, programs: code_manipulation.Function, check_falg = False):
+        if self._max_log_nums is not None and self._num_samples >= self._max_log_nums:
+            return
+        sample_orders: int = programs.global_sample_nums
+        if sample_orders not in self._all_sampled_functions:
+            self._num_samples += 1
+            self._all_sampled_functions[sample_orders] = programs
+
+            function = self._all_sampled_functions[sample_orders]
+            score = function.score
+            sample_time = function.sample_time
+            evaluate_time = function.evaluate_time
+            if function.score is not None and score > self._cur_best_program_score:
+                self._cur_best_program_score = score
+                self._cur_best_program_sample_order = sample_orders
+            
+            if score:
+                self._evaluate_success_program_num += 1
+                if check_falg:
+                    self._check_success_program_num += 1
+                    self._check_fail_program_num += 1
+            else:
+                self._evaluate_failed_program_num += 1
+
+            if sample_time:
+                self._tot_sample_time += sample_time
+            if evaluate_time:
+                self._tot_evaluate_time += evaluate_time
+            self._write_tensorboard_NS()
 
     def _record_and_verbose(self, sample_orders: int, island_id: int):
         function = self._all_sampled_functions[sample_orders]

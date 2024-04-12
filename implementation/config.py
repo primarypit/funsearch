@@ -43,6 +43,27 @@ class ProgramsDatabaseConfig:
     cluster_sampling_temperature_init: float = 0.1
     cluster_sampling_temperature_period: int = 30_000
 
+@dataclasses.dataclass(frozen=True)
+class ProgramsDatabase_NS_Config:
+    """Configuration of a ProgramsDatabase.
+
+    Attributes:
+      functions_per_prompt: Number of previous programs to include in prompts.
+      num_islands: Number of islands to maintain as a diversity mechanism.
+      reset_period: How often (in seconds) the weakest islands should be reset.
+      cluster_sampling_temperature_init: Initial temperature for softmax sampling
+          of clusters within an island.
+      cluster_sampling_temperature_period: Period of linear decay of the cluster
+          sampling temperature.
+    """
+    functions_per_prompt: int = 2
+    volume: int = 30
+    k: int = 5
+    threshold: float = 0.2
+    reset_period: int = 4 * 60 * 60
+    reset_num: int = 50
+    cluster_sampling_temperature_init: float = 0.1
+    cluster_sampling_temperature_period: int = 30_000
 
 @dataclasses.dataclass(frozen=True)
 class Config:
@@ -60,6 +81,7 @@ class Config:
           obtain for each prompt.
     """
     programs_database: ProgramsDatabaseConfig = dataclasses.field(default_factory=ProgramsDatabaseConfig)
+    programs_database_NS: ProgramsDatabase_NS_Config = dataclasses.field(default_factory=ProgramsDatabase_NS_Config)
     num_samplers: int = 1  # RZ: I just use one samplers
     # num_evaluators: int = 140
     num_evaluators: int = 1  # RZ: I just use one evaluators

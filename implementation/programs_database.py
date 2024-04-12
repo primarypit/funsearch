@@ -22,7 +22,6 @@ import copy
 import dataclasses
 import time
 from typing import Any, Tuple, Mapping
-
 from absl import logging
 import numpy as np
 import scipy
