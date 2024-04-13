@@ -155,7 +155,7 @@ class ProgramsDatabase_NS():
             logging.info("Reset...")
             self.pop_pop()
 
-        if self.register_num % self.threshold_update_step == 0:
+        if self.register_num % self.threshold_update_step == 0 and check_flag:
             self.threshold *= self.gamma
             if self.threshold > 1:
                 self.threshold = 1 / self.threshold
