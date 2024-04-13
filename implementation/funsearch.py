@@ -127,7 +127,8 @@ def FunSeach_Step(
     """
     function_to_evolve, function_to_run = _extract_function_names(specification)
     template = code_manipulation.text_to_program(specification)
-    database = programs_database.ProgramsDatabase(config.programs_database, template, function_to_evolve)
+    program_dir = kwargs.get('program_dir', None)
+    database = programs_database.ProgramsDatabase(config.programs_database, template, function_to_evolve, program_dir)
 
     # get log_dir and create profiler
 
