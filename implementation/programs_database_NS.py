@@ -159,7 +159,6 @@ class ProgramsDatabase_NS():
             self.threshold *= self.gamma
             if self.threshold > 1:
                 self.threshold = 1 / self.threshold
-            self.save_programs_after_reset()
             logging.info("New threshold %s", self.threshold)
 
     def pop_pop(self):
