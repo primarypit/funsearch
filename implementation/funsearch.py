@@ -49,7 +49,6 @@ def _extract_function_names(specification: str) -> Tuple[str, str]:
         raise ValueError('Expected 1 function decorated with `@funsearch.evolve`.')
     return evolve_functions[0], run_functions[0]
 
-
 def main(
         specification: str,
         inputs: Sequence[Any],
@@ -66,9 +65,11 @@ def main(
         config       : config file.
         max_sample_nums: the maximum samples nums from LLM. 'None' refers to no stop.
     """
+    programs_dir = kwargs.get('programs_dir', None)
+
     function_to_evolve, function_to_run = _extract_function_names(specification)
     template = code_manipulation.text_to_program(specification)
-    database = programs_database.ProgramsDatabase(config.programs_database, template, function_to_evolve)
+    database = programs_database.ProgramsDatabase(config.programs_database, template, function_to_evolve, programs_dir)
 
     # get log_dir and create profiler
     log_dir = kwargs.get('log_dir', None)
@@ -101,6 +102,53 @@ def main(
     # sampler enters an infinite loop, without parallelization only the first
     # sampler will do any work.
     # notebook.start("--logdir " + log_dir)
+    for s in samplers:
+        s.sample(profiler=profiler)
+    
+    database.save_programs()
+
+def FunSeach_Step(
+        specification: str,
+        inputs: Sequence[Any],
+        config: config_lib.Config,
+        max_sample_nums: int | None,
+        class_config: config_lib.ClassConfig,
+        programs: list[code_manipulation.Function],
+        profiler: profile.Profiler,
+        **kwargs
+):
+    """Launches a FunSearch experiment.
+    RZ:
+    Args:
+        specification: the boilerplate code for the problem.
+        inputs       : the data instances for the problem (see 'bin_packing_utils.py').
+        config       : config file.
+        max_sample_nums: the maximum samples nums from LLM. 'None' refers to no stop.
+    """
+    function_to_evolve, function_to_run = _extract_function_names(specification)
+    template = code_manipulation.text_to_program(specification)
+    database = programs_database.ProgramsDatabase(config.programs_database, template, function_to_evolve)
+
+    # get log_dir and create profiler
+
+    evaluators = []
+    for _ in range(config.num_evaluators):
+        evaluators.append(evaluator.Evaluator(
+            database,
+            template,
+            function_to_evolve,
+            function_to_run,
+            inputs,
+            timeout_seconds=config.evaluate_timeout_seconds,
+            sandbox_class=class_config.sandbox_class
+        ))
+
+    for i in range(len(programs)):
+        evaluators[0].analyse(programs[i], island_id=i, version_generated=None, profiler=profiler)
+
+    samplers = [sampler.Sampler(database, evaluators, config.samples_per_prompt, max_sample_nums=max_sample_nums, llm_class=class_config.llm_class, reset_num = config.sample_reset_num)
+                for _ in range(config.num_samplers)]
+
     for s in samplers:
         s.sample(profiler=profiler)
     

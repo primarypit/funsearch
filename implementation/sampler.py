@@ -24,6 +24,7 @@ from absl import logging
 
 from implementation import evaluator
 from implementation import programs_database
+from implementation import programs_database_NS
 
 
 class LLM(ABC):
@@ -75,7 +76,7 @@ class Sampler:
 
     def __init__(
             self,
-            database: programs_database.ProgramsDatabase,
+            database: programs_database.ProgramsDatabase | programs_database_NS.ProgramsDatabase_NS,
             evaluators: Sequence[evaluator.Evaluator],
             samples_per_prompt: int,
             reset_num: int,
@@ -123,7 +124,7 @@ class Sampler:
         """
         while True:
             # stop the search process if hit global max sample nums
-            if self._max_sample_nums and self.__class__._global_samples_nums >= self._max_sample_nums:
+            if self._max_sample_nums and self._database.get_register_num() >= self._max_sample_nums:
                 break
 
             prompt = self._database.get_prompt()

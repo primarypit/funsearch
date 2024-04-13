@@ -49,8 +49,7 @@ def _extract_function_names(specification: str) -> Tuple[str, str]:
         raise ValueError('Expected 1 function decorated with `@funsearch.evolve`.')
     return evolve_functions[0], run_functions[0]
 
-
-def main(
+def NoveltySearch(
         specification: str,
         inputs: Sequence[Any],
         config: config_lib.Config,
@@ -68,7 +67,8 @@ def main(
     """
     function_to_evolve, function_to_run = _extract_function_names(specification)
     template = code_manipulation.text_to_program(specification)
-    database = programs_database_NS.ProgramsDatabase_NS(config.programs_database_NS, template, function_to_evolve)
+    program_dir = kwargs.get('program_dir', None)
+    database = programs_database_NS.ProgramsDatabase_NS(config.programs_database_NS, template, function_to_evolve, program_dir)
 
     # get log_dir and create profiler
     log_dir = kwargs.get('log_dir', None)
@@ -103,4 +103,55 @@ def main(
     # notebook.start("--logdir " + log_dir)
     for s in samplers:
         s.sample_NS(profiler=profiler)
+    
     database.save_allprograms()
+
+    return database.get_all_programs()
+
+def Novelty_Step(specification: str,
+        inputs: Sequence[Any],
+        config: config_lib.Config,
+        max_sample_nums: int | None,
+        class_config: config_lib.ClassConfig,
+        programs: list[code_manipulation.Function],
+        profiler: profile.Profiler,
+        **kwargs
+):
+    
+    function_to_evolve, function_to_run = _extract_function_names(specification)
+    template = code_manipulation.text_to_program(specification)
+    program_dir = kwargs.get('program_dir', None)
+    database = programs_database_NS.ProgramsDatabase_NS(config.programs_database_NS, template, function_to_evolve, program_dir)
+
+    evaluators = []
+    for _ in range(config.num_evaluators):
+        evaluators.append(evaluator.Evaluator(
+            database,
+            template,
+            function_to_evolve,
+            function_to_run,
+            inputs,
+            timeout_seconds=config.evaluate_timeout_seconds,
+            sandbox_class=class_config.sandbox_class
+        ))
+    
+    if programs == []:
+        initial = template.get_function(function_to_evolve).body
+        evaluators[0].analyse_NS(initial, version_generated=None, profiler=profiler)
+    else:
+        for p in programs:
+            evaluators[0].analyse_NS(p, version_generated=None, profiler=profiler)
+    
+    samplers = [sampler.Sampler(database, evaluators, config.samples_per_prompt, max_sample_nums=max_sample_nums, llm_class=class_config.llm_class, reset_num = config.sample_reset_num)
+                for _ in range(config.num_samplers)]
+
+    # This loop can be executed in parallel on remote sampler machines. As each
+    # sampler enters an infinite loop, without parallelization only the first
+    # sampler will do any work.
+    # notebook.start("--logdir " + log_dir)
+    for s in samplers:
+        s.sample_NS(profiler=profiler)
+
+    database.save_allprograms()
+
+    return database.get_all_programs()

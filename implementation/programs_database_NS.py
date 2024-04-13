@@ -4,6 +4,7 @@ from collections.abc import Mapping, Sequence
 import copy
 import dataclasses
 import time
+import heapq
 from typing import Any, Tuple, Mapping
 from queue import PriorityQueue
 from absl import logging
@@ -14,6 +15,7 @@ from implementation import code_manipulation
 from implementation import config as config_lib
 from nltk.metrics import edit_distance
 import json
+import multiprocessing
 
 ScoresPerTest = Mapping[Any, float]
 
@@ -59,6 +61,7 @@ class ProgramsDatabase_NS():
             config: config_lib.ProgramsDatabase_NS_Config,
             template: code_manipulation.Program,
             function_to_evolve: str,
+            dir: str,
     ) -> None:
         
         self._config: config_lib.ProgramsDatabaseConfig = config
@@ -77,6 +80,11 @@ class ProgramsDatabase_NS():
         self.save_period = 10
         self.score_threshold = 0.9
         self.gamma = 1.5
+
+        self.dir = dir
+
+    def get_register_num(self) -> int:
+        return self.register_num
     
     def calc_sim(self, routes1, routes2):
         # 0 <= sum / l < 1, smaller value -> more similar
@@ -156,7 +164,7 @@ class ProgramsDatabase_NS():
 
     def pop_pop(self):
 
-        rous = []
+        rous = [] * self.volume
 
         tmp_best_P = None
         best_id = None
@@ -174,11 +182,10 @@ class ProgramsDatabase_NS():
             pbar.set_description("Processing pop " + str(i))
             routes = self.pop[i].get_rotues()
             sims = []
-            for j in range(len(self.pop)):
-                if j != i:
-                    target_routes = self.pop[j].get_rotues()
-                    sims.append(self.calc_sim(routes, target_routes))
-            rous.append(sum(sorted(sims)[:self.k]) / self.k)
+            left_target_routes = [self.pop[j].get_rotues() for j in list(range(self.pop)) if j != i]
+            for target_routes in left_target_routes:
+                sims.append(self.calc_sim(routes, target_routes))
+            rous.append(sum(heapq.nlargest(self.k, sims)) / self.k)
         
         keep_ids = np.argsort(-np.array(rous))[:(self.volume - 1)]
 
@@ -246,14 +253,18 @@ class ProgramsDatabase_NS():
         prompt = dataclasses.replace(self._template, functions=versioned_functions)
         return str(prompt)
     
-    def save_programs_after_reset(self):
+    def get_all_programs(self):
+
+        return [P.get_imp() for P in self.pop]
+
+    '''def save_programs_after_reset(self):
         curprograms = [str(P.get_imp()) for P in self.pop]
-        with open("programs_round_{}.json".format(self.register_num), "w") as file:
-            json.dump(curprograms, file)
+        with open("{}/programs_round_{}.json".format(self.dir, self.register_num), "w") as file:
+            json.dump(curprograms, file)'''
 
     def save_allprograms(self):
         allprograms = [str(P.get_imp()) for P in self.pop]
-        with open("allprograms.json", "w") as file:
+        with open("{}/allprograms.json".format(self.dir), "w") as file:
             json.dump(allprograms, file)
-        with open("bestprograms.json", "w") as file:
+        with open("{}/bestprograms.json".format(self.dir), "w") as file:
             json.dump(str(self.bestprogram.get_imp()))

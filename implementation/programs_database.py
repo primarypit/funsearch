@@ -91,6 +91,7 @@ class ProgramsDatabase:
             config: config_lib.ProgramsDatabaseConfig,
             template: code_manipulation.Program,
             function_to_evolve: str,
+            dir: str,
     ) -> None:
         self._config: config_lib.ProgramsDatabaseConfig = config
         self._template: code_manipulation.Program = template
@@ -113,8 +114,13 @@ class ProgramsDatabase:
         self._last_reset_time: float = time.time()
         self._register_nums = 0
 
+        self.dir = dir
+
     def get_island_num(self) -> int:
         return len(self._islands)
+
+    def get_bestprograms(self) -> list[code_manipulation.Function]:
+        return self._best_program_per_island
 
     def get_prompt(self) -> Prompt:
         """Returns a prompt containing implementations from one chosen island."""
@@ -231,10 +237,10 @@ class ProgramsDatabase:
                 res[i][sig_str]["score"] = score
                 res[i][sig_str]["programs"] = programs
         
-        with open("best_programs.json", "w") as file:
+        with open("{}/best_programs.json".format(self.dir), "w") as file:
             json.dump(best_programs, file)
 
-        with open("all_programs.json", "w") as file:
+        with open("{}/all_programs.json".format(self.dir), "w") as file:
             json.dump(res, file)
 
 
