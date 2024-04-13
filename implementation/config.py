@@ -62,7 +62,7 @@ class ProgramsDatabase_NS_Config:
     threshold: float = 0.1
     reset_period: int = 4 * 60 * 60
     reset_num: int = 50
-    cluster_sampling_temperature_init: float = 0.1
+    cluster_sampling_temperature_init: float = 0.2
     cluster_sampling_temperature_period: int = 30_000
 
 @dataclasses.dataclass(frozen=True)

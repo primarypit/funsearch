@@ -77,7 +77,7 @@ class ProgramsDatabase_NS():
         self.bestprogram: Program_NS = None
         self.reset_num = 0
         self.register_num = 0
-        self.save_period = 10
+        self.threshold_update_step = 4
         self.score_threshold = 0.9
         self.gamma = 1.5
 
@@ -155,7 +155,7 @@ class ProgramsDatabase_NS():
             logging.info("Reset...")
             self.pop_pop()
 
-        if self.register_num % self.save_period == 0:
+        if self.register_num % self.threshold_update_step == 0:
             self.threshold *= self.gamma
             if self.threshold > 1:
                 self.threshold = 1 / self.threshold
