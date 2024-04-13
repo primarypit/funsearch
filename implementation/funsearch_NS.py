@@ -140,7 +140,7 @@ def Novelty_Step(specification: str,
         evaluators[0].analyse_NS(initial, version_generated=None, profiler=profiler)
     else:
         for p in programs:
-            evaluators[0].analyse_NS(p, version_generated=None, profiler=profiler)
+            evaluators[0].analyse_NS(p.body, version_generated=None, profiler=profiler)
     
     samplers = [sampler.Sampler(database, evaluators, config.samples_per_prompt, max_sample_nums=max_sample_nums, llm_class=class_config.llm_class, reset_num = config.sample_reset_num)
                 for _ in range(config.num_samplers)]
