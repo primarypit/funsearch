@@ -30,7 +30,7 @@ from implementation import programs_database
 from implementation import sampler
 from implementation import profile
 import json
-
+from absl import logging
 
 def _extract_function_names(specification: str) -> Tuple[str, str]:
     """Returns the name of the function to evolve and of the function to run.
@@ -144,8 +144,9 @@ def FunSeach_Step(
             sandbox_class=class_config.sandbox_class
         ))
 
+    logging.info("Initialize for sample programs from Novelty Search...")
     for i in range(len(programs)):
-        evaluators[0].analyse(programs[i], island_id=i, version_generated=None, profiler=profiler)
+        evaluators[0].analyse(programs[i], island_id = i, version_generated=None, profiler=profiler)
 
     samplers = [sampler.Sampler(database, evaluators, config.samples_per_prompt, max_sample_nums=max_sample_nums, llm_class=class_config.llm_class, reset_num = config.sample_reset_num)
                 for _ in range(config.num_samplers)]
