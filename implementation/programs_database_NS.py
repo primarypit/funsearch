@@ -182,7 +182,7 @@ class ProgramsDatabase_NS():
             pbar.set_description("Processing pop " + str(i))
             routes = self.pop[i].get_rotues()
             sims = []
-            left_target_routes = [self.pop[j].get_rotues() for j in list(range(self.pop)) if j != i]
+            left_target_routes = [self.pop[j].get_rotues() for j in range(len(self.pop)) if j != i]
             for target_routes in left_target_routes:
                 sims.append(self.calc_sim(routes, target_routes))
             rous.append(sum(heapq.nlargest(self.k, sims)) / self.k)
