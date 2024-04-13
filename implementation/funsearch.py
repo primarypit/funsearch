@@ -144,8 +144,8 @@ def FunSeach_Step(
             sandbox_class=class_config.sandbox_class
         ))
 
-    logging.info("Initialize for sample programs from Novelty Search...")
     for i in range(len(programs)):
+        logging.info("Initialize for sample programs from Novelty Search...Island %d", i)
         evaluators[0].analyse(programs[i], island_id = i, version_generated=None, profiler=profiler)
 
     samplers = [sampler.Sampler(database, evaluators, config.samples_per_prompt, max_sample_nums=max_sample_nums, llm_class=class_config.llm_class, reset_num = config.sample_reset_num)
