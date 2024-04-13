@@ -266,4 +266,4 @@ class ProgramsDatabase_NS():
         with open("{}/allprograms.json".format(self.dir), "w") as file:
             json.dump(allprograms, file)
         with open("{}/bestprograms.json".format(self.dir), "w") as file:
-            json.dump(str(self.bestprogram.get_imp()))
+            json.dump(str(self.bestprogram.get_imp()), file)
