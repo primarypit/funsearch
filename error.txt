@@ -1,0 +1,98 @@
+
+        An attempt has been made to start a new process before the
+        current process has finished its bootstrapping phase.
+
+        This probably means that you are not using fork to start your
+        child processes and you have forgotten to use the proper idiom
+        in the main module:
+
+            if __name__ == '__main__':
+                freeze_support()
+                ...
+
+        The "freeze_support()" line can be omitted if the program
+        is not going to be frozen to produce an executable.
+
+
+        An attempt has been made to start a new process before the
+        current process has finished its bootstrapping phase.
+
+        This probably means that you are not using fork to start your
+        child processes and you have forgotten to use the proper idiom
+        in the main module:
+
+            if __name__ == '__main__':
+                freeze_support()
+                ...
+
+        The "freeze_support()" line can be omitted if the program
+        is not going to be frozen to produce an executable.
+
+Failed in nopython mode pipeline (step: nopython frontend)
+[1m[1m[1mNo implementation of function Function(<ufunc 'logical_not'>) found for signature:
+ 
+ >>> logical_not(reflected list(bool)<iv=None>)
+ 
+There are 2 candidate implementations:
+[1m  - Of which 2 did not match due to:
+  Overload in function 'Numpy_rules_ufunc.generic': File: numba\core\typing\npydecl.py: Line 97.
+    With argument(s): '(reflected list(bool)<iv=None>)':[0m
+[1m   Rejected as the implementation raised a specific error:
+     TypingError: [1mcan't resolve ufunc logical_not for types [List(bool, True)][0m[0m
+  raised from c:\Users\28951\anaconda3\lib\site-packages\numba\core\typing\npydecl.py:106
+[0m
+[0m[1mDuring: resolving callee type: Function(<ufunc 'logical_not'>)[0m
+[0m[1mDuring: typing of call at <string> (53)
+[0m
+[1m
+File "<string>", line 53:[0m
+[1m<source missing, REPL/exec in use?>[0m
+
+
+Failed in nopython mode pipeline (step: nopython frontend)
+[1m[1m[1mNo implementation of function Function(<ufunc 'logical_not'>) found for signature:
+ 
+ >>> logical_not(reflected list(bool)<iv=None>)
+ 
+There are 2 candidate implementations:
+[1m  - Of which 2 did not match due to:
+  Overload in function 'Numpy_rules_ufunc.generic': File: numba\core\typing\npydecl.py: Line 97.
+    With argument(s): '(reflected list(bool)<iv=None>)':[0m
+[1m   Rejected as the implementation raised a specific error:
+     TypingError: [1mcan't resolve ufunc logical_not for types [List(bool, True)][0m[0m
+  raised from c:\Users\28951\anaconda3\lib\site-packages\numba\core\typing\npydecl.py:106
+[0m
+[0m[1mDuring: resolving callee type: Function(<ufunc 'logical_not'>)[0m
+[0m[1mDuring: typing of call at <string> (53)
+[0m
+[1m
+File "<string>", line 53:[0m
+[1m<source missing, REPL/exec in use?>[0m
+
+
+Some places not visited!
+
+Some places not visited!
+
+Some places not visited!
+
+Some places not visited!
+
+boolean index did not match indexed array along dimension 0; dimension is 98 but corresponding boolean dimension is 100
+
+boolean index did not match indexed array along dimension 0; dimension is 415 but corresponding boolean dimension is 417
+
+Some places not visited!
+
+Some places not visited!
+
+'NoneType' object does not support item assignment
+
+'NoneType' object does not support item assignment
+
+'NoneType' object does not support item assignment
+
+'NoneType' object does not support item assignment
+
+'NoneType' object does not support item assignment
+

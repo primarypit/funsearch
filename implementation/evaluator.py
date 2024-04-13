@@ -181,6 +181,8 @@ class Evaluator:
         new_function, program = _sample_to_program(
             sample, version_generated, self._template, self._function_to_evolve)
         scores_per_test = {}
+        routes_per_test = []
+        sflag = True
 
         time_reset = time.time()
         for current_input in self._inputs:
@@ -188,23 +190,26 @@ class Evaluator:
             # current_input is a key (perhaps in string type)
             # do not ignore this when implementing SandBox !!!
 
-            test_output, runs_ok = self._sandbox.run(
+            results, runs_ok = self._sandbox.run(
                 program, self._function_to_run, self._function_to_evolve, self._inputs, current_input,
                 self._timeout_seconds
             )
-
-            if runs_ok and not _calls_ancestor(program, self._function_to_evolve) and test_output is not None:
-                if not isinstance(test_output, (int, float)):
-                    print(f'RZ=> Error: test_output is {test_output}')
+            if runs_ok:
+                test_score, route = results[0], results[1]
+            else:
+                sflag = False
+            if runs_ok and not _calls_ancestor(program, self._function_to_evolve) and test_score is not None:
+                if not isinstance(test_score, (int, float)):
+                    print(f'RZ=> Error: test_output is {test_score}')
                     raise ValueError('@function.run did not return an int/float score.')
-                scores_per_test[current_input] = test_output
-
+                scores_per_test[current_input] = test_score
+                routes_per_test.append(route)
         evaluate_time = time.time() - time_reset
 
         # RZ: If 'score_per_test' is not empty, the score of the program will be recorded to the profiler by the 'register_program'.
         # This is because the register_program will do reduction for a given Function score.
         # If 'score_per_test' is empty, we record it to the profiler at once.
-        if scores_per_test:
+        if sflag:
             if island_id is not None:
                 self._database.update()
             self._database.register_program(
