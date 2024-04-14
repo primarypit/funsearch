@@ -115,7 +115,10 @@ class ProgramsDatabase:
         self._register_nums = 0
 
         self.dir = dir
-
+    
+    def get_register_num(self):
+        return self._register_nums
+    
     def get_island_num(self) -> int:
         return len(self._islands)
 
