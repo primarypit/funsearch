@@ -135,18 +135,18 @@ class ProgramsDatabase_NS():
         check_flag = False
         score = _reduce_score(scores_per_test)
         cur_program = program
-        if score > self.bestscore:
-            logging.info('Best score increased to %s', score)
         
         # 0 < priority <= 1
         if self.pop == []:
             Cur_P = Program_NS(score, routes, cur_program)
             self.bestscore = score
+            logging.info('Best score increased to %s', score)
             self.bestprogram = Cur_P
             self.pop.append(Cur_P)
             self.register_num += 1
             check_flag = True
         elif score > self.bestscore: # new best program
+            logging.info('Best score increased to %s', score)
             Cur_P = Program_NS(score, routes, cur_program)
             self.bestscore = score
             self.bestprogram = Cur_P
