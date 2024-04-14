@@ -267,3 +267,6 @@ class ProgramsDatabase_NS():
             json.dump(allprograms, file)
         with open("{}/bestprograms.json".format(self.dir), "w") as file:
             json.dump(str(self.bestprogram.get_imp()), file)
+        allroutes = [P.get_rotues() for P in self.pop]
+        with open("{}/allroutes.json".format(self.dir), "w") as file:
+            json.dump(allroutes, file)
