@@ -79,7 +79,7 @@ class ProgramsDatabase_NS():
         self.register_num = 0
         self.threshold_update_step = 4
         self.gamma = 1.5
-
+        self.log_internal = 10
         self.dir = dir
 
     def get_register_num(self) -> int:
@@ -183,7 +183,8 @@ class ProgramsDatabase_NS():
         if len(self.pop) > self.volume:
             logging.info("Reset...")
             self.pop_pop()
-
+        if self.register_num % self.log_internal == 0 and check_flag:
+            self.log_cur_programs()
         if self.register_num % self.threshold_update_step == 0 and check_flag:
             self.threshold *= self.gamma
             if self.threshold > 1:
@@ -289,6 +290,17 @@ class ProgramsDatabase_NS():
         curprograms = [str(P.get_imp()) for P in self.pop]
         with open("{}/programs_round_{}.json".format(self.dir, self.register_num), "w") as file:
             json.dump(curprograms, file)'''
+    
+    def log_cur_programs(self):
+        allprograms = [str(P.get_imp()) for P in self.pop]
+        with open("{}/allprograms_{}.json".format(self.dir,self.register_num), "w") as file:
+            json.dump(allprograms, file)
+        allroutes = [P.get_rotues() for P in self.pop]
+        for i in range(len(self.pop)):
+            curroutes = allroutes[i]
+            for j in range(len(curroutes)):
+                cur_route = np.array(curroutes[j])
+                np.save("{}/route_{}_{}_{}.npy".format(self.dir,self.register_num, i, j), cur_route)
 
     def save_allprograms(self):
         allprograms = [str(P.get_imp()) for P in self.pop]
