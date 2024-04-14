@@ -155,3 +155,5 @@ def FunSeach_Step(
         s.sample(profiler=profiler)
     
     database.save_programs()
+
+    return database.get_bestprograms()
