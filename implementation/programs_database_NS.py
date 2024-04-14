@@ -93,6 +93,36 @@ class ProgramsDatabase_NS():
             r1, r2 = routes1[i], routes2[i]
             sum += edit_distance(r1, r2) / len(r1)
         return sum / l
+    
+    def register_fs_program(
+            self, 
+            fs_program:code_manipulation.Function,
+            scores_per_test: ScoresPerTest,
+            routes: list,
+            **kwargs
+    ) -> None:
+        
+        check_flag = True
+        score = _reduce_score(scores_per_test)
+        cur_program = fs_program
+        Cur_P = Program_NS(score, routes, cur_program)
+        self.pop.append(Cur_P)
+        self.register_num += 1
+        if score > self.bestscore:
+            logging.info('Best score increased to %s', score)
+            self.bestprogram = Cur_P
+        
+        profiler: profile.Profiler = kwargs.get('profiler', None)
+        if profiler:
+            global_sample_nums = kwargs.get('global_sample_nums', None)
+            sample_time = kwargs.get('sample_time', None)
+            evaluate_time = kwargs.get('evaluate_time', None)
+            cur_program.score = score
+            cur_program.global_sample_nums = global_sample_nums
+            cur_program.sample_time = sample_time
+            cur_program.evaluate_time = evaluate_time
+            profiler.register_function_NS(cur_program, check_flag)
+
 
     def register_program(
             self,

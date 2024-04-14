@@ -297,3 +297,70 @@ class Evaluator:
                 new_function.sample_time = sample_time
                 new_function.evaluate_time = evaluate_time
                 profiler.register_function_NS(new_function)
+    
+    def analyse_force(
+            self,
+            sample: str,
+            version_generated: int | None,
+            **kwargs  # RZ: add this to do profile
+    ) -> None:
+        """Compiles the sample into a program and executes it on test inputs.
+
+        Args:
+            sample: RZ: please note that the sample must be preprocessed--only have function body,
+                    no description before it (except annotations), no symbols before it.
+                    Or the "_sample_to_program" function will fail!!!
+        """
+        # RZ: 'new_function' refers to the evolved function ('def' statement + function body)
+        # RZ: 'program' is the template code + new_function
+        new_function, program = _sample_to_program(
+            sample, version_generated, self._template, self._function_to_evolve)
+        scores_per_test = {}
+        routes_per_test = []
+
+        sflag = True
+
+        time_reset = time.time()
+        for current_input in self._inputs:
+            # RZ: IMPORTANT !!! if self._inputs is a dict,
+            # current_input is a key (perhaps in string type)
+            # do not ignore this when implementing SandBox !!!
+
+            results, runs_ok = self._sandbox.run(
+                program, self._function_to_run, self._function_to_evolve, self._inputs, current_input,
+                self._timeout_seconds
+            )
+            if runs_ok:
+                test_score, route = results[0], results[1]
+            else:
+                sflag = False
+            if runs_ok and not _calls_ancestor(program, self._function_to_evolve) and test_score is not None:
+                if not isinstance(test_score, (int, float)):
+                    print(f'RZ=> Error: test_output is {test_score}')
+                    raise ValueError('@function.run did not return an int/float score.')
+                scores_per_test[current_input] = test_score
+                routes_per_test.append(route)
+
+        evaluate_time = time.time() - time_reset
+
+        # RZ: If 'score_per_test' is not empty, the score of the program will be recorded to the profiler by the 'register_program'.
+        # This is because the register_program will do reduction for a given Function score.
+        # If 'score_per_test' is empty, we record it to the profiler at once.
+        if sflag:
+            self._database.register_fs_program(
+                new_function,
+                scores_per_test,
+                routes_per_test,
+                **kwargs,
+                evaluate_time=evaluate_time
+            )
+        else:
+            profiler: profile.Profiler = kwargs.get('profiler', None)
+            if profiler:
+                global_sample_nums = kwargs.get('global_sample_nums', None)
+                sample_time = kwargs.get('sample_time', None)
+                new_function.global_sample_nums = global_sample_nums
+                new_function.score = None
+                new_function.sample_time = sample_time
+                new_function.evaluate_time = evaluate_time
+                profiler.register_function_NS(new_function)
