@@ -187,8 +187,8 @@ class ProgramsDatabase_NS():
             self.log_cur_programs()
         if self.register_num % self.threshold_update_step == 0 and check_flag:
             self.threshold *= self.gamma
-            if self.threshold > 1:
-                self.threshold = 1 / self.threshold
+            if self.threshold > 0.5:
+                self.threshold = 0.25 / self.threshold
             logging.info("New threshold %s", self.threshold)
 
     def pop_pop(self):
