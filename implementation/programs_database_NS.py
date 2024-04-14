@@ -268,5 +268,8 @@ class ProgramsDatabase_NS():
         with open("{}/bestprograms.json".format(self.dir), "w") as file:
             json.dump(str(self.bestprogram.get_imp()), file)
         allroutes = [P.get_rotues() for P in self.pop]
-        with open("{}/allroutes.json".format(self.dir), "w") as file:
-            json.dump(allroutes, file)
+        for i in range(len(self.pop)):
+            curroutes = allroutes[i]
+            for j in range(len(curroutes)):
+                cur_route = np.array(curroutes[j])
+                np.save("{}/route_{}_{}.npy".format(self.dir, i, j), cur_route)
