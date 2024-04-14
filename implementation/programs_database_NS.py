@@ -78,7 +78,6 @@ class ProgramsDatabase_NS():
         self.reset_num = 0
         self.register_num = 0
         self.threshold_update_step = 4
-        self.score_threshold = 0.9
         self.gamma = 1.5
 
         self.dir = dir
@@ -131,7 +130,7 @@ class ProgramsDatabase_NS():
                 target_routes = P.get_rotues()
                 sims.append(self.calc_sim(routes, target_routes))
             novelty_v = sum(sorted(sims)[:self.k]) / self.k
-            if novelty_v  > self.threshold and score > self.score_threshold:
+            if novelty_v  > self.threshold and score > self.bestscore * 0.9:
                 logging.info("Current novelty %s, Current score %s, Accept.", novelty_v, score)
                 Cur_P = Program_NS(score, routes, cur_program)
                 self.pop.append(Cur_P)
