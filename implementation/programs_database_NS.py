@@ -124,7 +124,6 @@ class ProgramsDatabase_NS():
             cur_program.evaluate_time = evaluate_time
             profiler.register_function_NS(cur_program, check_flag)
 
-
     def register_program(
             self,
             program: code_manipulation.Function,
@@ -156,19 +155,22 @@ class ProgramsDatabase_NS():
             check_flag = True
         else:
             sims = [] # all sim belong to (0, 1)
-            
             for P in self.pop:
                 target_routes = P.get_rotues()
                 sims.append(self.calc_sim(routes, target_routes))
-            novelty_v = sum(sorted(sims)[:self.k]) / self.k
-            if novelty_v  > self.threshold and score > self.bestscore * 0.9:
-                logging.info("Current novelty %s, Current score %s, Current best socre %s, Accept.", novelty_v, score, self.bestscore)
-                Cur_P = Program_NS(score, routes, cur_program)
-                self.pop.append(Cur_P)
-                self.register_num += 1
-                check_flag = True
+            if 0 in sims:
+                novelty_v = 0
+                logging.info("Current novelty %s, duplicate version, Current score %s, Current best socre %s, Reject", novelty_v, score, self.bestscore)
             else:
-                logging.info("Current novelty %s, Current score %s, Current best socre %s, Reject", novelty_v, score, self.bestscore)
+                novelty_v = sum(sorted(sims)[:self.k]) / self.k
+                if novelty_v  > self.threshold and score > self.bestscore * 0.9:
+                    logging.info("Current novelty %s, Current score %s, Current best socre %s, Accept.", novelty_v, score, self.bestscore)
+                    Cur_P = Program_NS(score, routes, cur_program)
+                    self.pop.append(Cur_P)
+                    self.register_num += 1
+                    check_flag = True
+                else:
+                    logging.info("Current novelty %s, Current score %s, Current best socre %s, Reject", novelty_v, score, self.bestscore)
         
         profiler: profile.Profiler = kwargs.get('profiler', None)
         if profiler:
