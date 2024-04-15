@@ -141,13 +141,13 @@ class ProgramsDatabase_NS():
         if self.pop == []:
             Cur_P = Program_NS(score, routes, cur_program)
             self.bestscore = score
-            logging.info('Best score increased to %s, Accept', score)
+            logging.info('Best score increased to %s, Current best socre %s, Accept', score, self.bestscore)
             self.bestprogram = Cur_P
             self.pop.append(Cur_P)
             self.register_num += 1
             check_flag = True
         elif score > self.bestscore: # new best program
-            logging.info('Best score increased to %s, Accept', score)
+            logging.info('Best score increased to %s, Current best socre %s, Accept', score, self.bestscore)
             Cur_P = Program_NS(score, routes, cur_program)
             self.bestscore = score
             self.bestprogram = Cur_P
@@ -162,13 +162,13 @@ class ProgramsDatabase_NS():
                 sims.append(self.calc_sim(routes, target_routes))
             novelty_v = sum(sorted(sims)[:self.k]) / self.k
             if novelty_v  > self.threshold and score > self.bestscore * 0.9:
-                logging.info("Current novelty %s, Current score %s, Accept.", novelty_v, score)
+                logging.info("Current novelty %s, Current score %s, Current best socre %s, Accept.", novelty_v, score, self.bestscore)
                 Cur_P = Program_NS(score, routes, cur_program)
                 self.pop.append(Cur_P)
                 self.register_num += 1
                 check_flag = True
             else:
-                logging.info("Current novelty %s, Current score %s, Reject", novelty_v, score)
+                logging.info("Current novelty %s, Current score %s, Current best socre %s, Reject", novelty_v, score, self.bestscore)
         
         profiler: profile.Profiler = kwargs.get('profiler', None)
         if profiler:
@@ -222,7 +222,7 @@ class ProgramsDatabase_NS():
         old_pop = self.pop
         self.pop = []
         self.pop.append(tmp_best_P)
-
+        logging.info("After Reset, cur best score %s", tmp_best_P.get_score())
         for id in keep_ids:
             self.pop.append(old_pop[id])
 
