@@ -108,9 +108,10 @@ class ProgramsDatabase_NS():
         Cur_P = Program_NS(score, routes, cur_program)
         self.pop.append(Cur_P)
         self.register_num += 1
+        logging.info('Initialize, cur %s, Accept', score)
         if score > self.bestscore:
-            logging.info('Best score increased to %s', score)
             self.bestprogram = Cur_P
+            self.bestscore = score
         
         profiler: profile.Profiler = kwargs.get('profiler', None)
         if profiler:
@@ -140,13 +141,13 @@ class ProgramsDatabase_NS():
         if self.pop == []:
             Cur_P = Program_NS(score, routes, cur_program)
             self.bestscore = score
-            logging.info('Best score increased to %s', score)
+            logging.info('Best score increased to %s, Accept', score)
             self.bestprogram = Cur_P
             self.pop.append(Cur_P)
             self.register_num += 1
             check_flag = True
         elif score > self.bestscore: # new best program
-            logging.info('Best score increased to %s', score)
+            logging.info('Best score increased to %s, Accept', score)
             Cur_P = Program_NS(score, routes, cur_program)
             self.bestscore = score
             self.bestprogram = Cur_P
