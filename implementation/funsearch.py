@@ -152,7 +152,7 @@ def FunSeach_Step(
                 for _ in range(config.num_samplers)]
 
     for s in samplers:
-        s.sample(profiler=profiler)
+        s.sample(resetflag = False, profiler=profiler)
     
     database.save_programs()
 
