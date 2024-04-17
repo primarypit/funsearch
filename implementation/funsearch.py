@@ -143,10 +143,13 @@ def FunSeach_Step(
             timeout_seconds=config.evaluate_timeout_seconds,
             sandbox_class=class_config.sandbox_class
         ))
-
-    for i in range(len(programs)):
-        logging.info("Initialize for sample programs from Novelty Search...Island %d", i)
-        evaluators[0].analyse(programs[i].body, island_id = i, version_generated=None, profiler=profiler)
+    if programs == []:
+        initial = template.get_function(function_to_evolve).body
+        evaluators[0].analyse(initial, island_id=None, version_generated=None, profiler=profiler)
+    else:
+        for i in range(len(programs)):
+            logging.info("Initialize for sample programs from Novelty Search...Island %d", i)
+            evaluators[0].analyse(programs[i].body, island_id = i, version_generated=None, profiler=profiler)
 
     samplers = [sampler.Sampler(database, evaluators, config.samples_per_prompt, max_sample_nums=max_sample_nums, llm_class=class_config.llm_class, reset_num = config.sample_reset_num)
                 for _ in range(config.num_samplers)]
