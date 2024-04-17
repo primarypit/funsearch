@@ -58,7 +58,7 @@ class ProgramsDatabase_NS_Config:
     """
     functions_per_prompt: int = 2
     volume: int = 6
-    k: int = 3
+    k: int = 4
     threshold: float = 0.15
     reset_period: int = 4 * 60 * 60
     reset_num: int = 50

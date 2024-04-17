@@ -163,7 +163,7 @@ class ProgramsDatabase_NS():
                 logging.info("Current novelty %s, duplicate version, Current score %s, Current best socre %s, Reject", novelty_v, score, self.bestscore)
             else:
                 novelty_v = sum(sorted(sims)[:self.k]) / self.k
-                if novelty_v  > self.threshold and score > self.bestscore * 0.9:
+                if novelty_v  > self.threshold and score > self.bestscore * 0.95:
                     logging.info("Current novelty %s, Current score %s, Current best socre %s, Accept.", novelty_v, score, self.bestscore)
                     Cur_P = Program_NS(score, routes, cur_program)
                     self.pop.append(Cur_P)

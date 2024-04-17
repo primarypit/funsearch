@@ -115,9 +115,11 @@ class Sampler:
                     global_sample_nums=cur_global_sample_nums,
                     sample_time=sample_time
                 )
-                if cur_global_sample_nums % self.reset_num == 0 and cur_global_sample_nums != 0 and resetflag:
-                    logging.info("Reset, current total register nums: %d", cur_global_sample_nums)
-                    self._database.reset_islands()
+                if cur_global_sample_nums % self.reset_num == 0 and cur_global_sample_nums != 0:
+                    if resetflag:
+                        logging.info("Reset, current total register nums: %d", cur_global_sample_nums)
+                        self._database.reset_islands()
+                    self._database.save_programs(cur_global_sample_nums)
 
     def sample_NS(self, **kwargs):
         """Continuously gets prompts, samples programs, sends them for analysis.

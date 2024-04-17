@@ -105,7 +105,7 @@ def main(
     for s in samplers:
         s.sample(profiler=profiler)
     
-    database.save_programs()
+    #database.save_programs()
 
 def FunSeach_Step(
         specification: str,
@@ -157,6 +157,6 @@ def FunSeach_Step(
     for s in samplers:
         s.sample(resetflag = False, profiler=profiler)
     
-    database.save_programs()
+    #database.save_programs()
 
     return database.get_bestprograms()

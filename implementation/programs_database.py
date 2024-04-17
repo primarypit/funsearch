@@ -211,40 +211,12 @@ class ProgramsDatabase:
             founder_scores = self._best_scores_per_test_per_island[founder_island_id]
             self._register_program_in_island(founder, island_id, founder_scores)
     
-    def save_programs(self) -> dict:
-        res = {}
-
-        # res: island_id->cluster_sig->[func,...]
-        best_socre = None
-        best_programs = None
-
-        for i,island in enumerate(self._islands):
-            clusters = island.get_cludsters()
-            res[i] = {}
-            for sig in clusters.keys():
-                sig_str = "_".join([str(s) for s in sig])
-                res[i][sig_str] = {}
-                cur_cluster = clusters[sig]
-                score, programs = cur_cluster.get_socre_programs()
-                programs = [str(program) for program in programs]
-                if best_socre is None:
-                    best_socre = score
-                    best_programs = programs
-                elif score > best_socre:
-                    best_socre = score
-                    best_programs = programs
-                elif score == best_socre:
-                    for p in programs:
-                        if p not in best_programs:
-                            best_programs.append(p)
-                res[i][sig_str]["score"] = score
-                res[i][sig_str]["programs"] = programs
+    def save_programs(self, num):
+        best_programs = self._best_program_per_island
+        best_programs = [str(P) for P in best_programs]
         
-        with open("{}/best_programs.json".format(self.dir), "w") as file:
+        with open("{}/best_programs_{}.json".format(self.dir, num), "w") as file:
             json.dump(best_programs, file)
-
-        with open("{}/all_programs.json".format(self.dir), "w") as file:
-            json.dump(res, file)
 
 
 class Island:
